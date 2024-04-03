@@ -1,35 +1,27 @@
 import HeroSec from "../Components/HeroSec";
+import { HorizontalScroll } from "../Components/HorizontalScroll";
+import Loader from "../Components/Loader";
 import SideNav from "../Components/SideNav";
 import TopNav from "../Components/TopNav";
-import axios from "../Utils/axios";
-import { useEffect, useState } from "react";
+import { useTrending } from "../Hooks/useTrending";
+import { useSelector } from "react-redux";
 const Home = () => {
-  const [walpaper, setWalpaper] = useState(null);
+  useTrending();
+  const data = useSelector((store) => store?.movies?.trending);
 
-  useEffect(() => {
-    walpaper == null && getWallpaper();
-  }, []);
+  const walpaper = data && data[Math.floor(Math.random() * 20)];
 
-  const getWallpaper = async () => {
-    try {
-      const { data } = await axios.get(`/trending/all/day`);
-      const result = (Math.random() * data.results.length).toFixed();
-      setWalpaper(data.results[result]);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  console.log(walpaper);
   return walpaper ? (
     <div className="w-screen h-screen bg-[#1F1E24] flex">
       <SideNav />
-      <div className="w-[80%] p-6 h-screen">
+      <div className="w-[80%] p-6 h-screen overflow-auto ">
         <TopNav />
         <HeroSec data={walpaper} />
+        <HorizontalScroll movies={data} />
       </div>
     </div>
   ) : (
-    <h1>Loading...</h1>
+    <Loader />
   );
 };
 
